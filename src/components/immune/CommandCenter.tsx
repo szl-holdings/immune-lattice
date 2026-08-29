@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Globe2, Radio, Shield, Fingerprint, Boxes, Swords, Lock, Activity, Network, Share2, Ghost, ScanEye, Split, Cpu } from "lucide-react";
+import { Globe2, Radio, Shield, Fingerprint, Boxes, Swords, Lock, Activity, Network, Share2, Ghost, ScanEye, Split, Cpu, Map } from "lucide-react";
 import { LatticeGlobe } from "./LatticeGlobe";
 import {
   CommandDock,
@@ -13,6 +13,7 @@ import {
   IntelView,
   MeshView,
   RadarView,
+  FieldView,
   RangeView,
   SentraView,
   StatusBar,
@@ -34,6 +35,7 @@ const VIEWS: { id: ViewId; label: string; icon: typeof Globe2 }[] = [
   { id: "intel", label: "Intel", icon: Activity },
   { id: "estate", label: "Estate", icon: Boxes },
   { id: "radar", label: "Radar", icon: Cpu },
+  { id: "field", label: "Field", icon: Map },
   { id: "range", label: "Range", icon: Swords },
   { id: "ghost", label: "Ghost", icon: Ghost },
   { id: "wraith", label: "Wraith", icon: ScanEye },
@@ -143,6 +145,7 @@ export function CommandCenter() {
               {view === "intel" && <IntelView />}
               {view === "estate" && <EstateView />}
               {view === "radar" && <RadarView />}
+              {view === "field" && <FieldView />}
               {view === "range" && <RangeView />}
               {view === "ghost" && <GhostView />}
               {view === "wraith" && <WraithView />}

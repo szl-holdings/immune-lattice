@@ -30,6 +30,7 @@ import {
 } from "./wraith";
 import { openEcho } from "./echo";
 import { INFERENCE_RADAR, CANARIES } from "./radar";
+import { FIELD_CELLS, FIELD_HUNTS } from "./field";
 import type {
   Campaign,
   CounterOp,
@@ -49,7 +50,7 @@ import type {
 } from "./types";
 import type { RadarVerb } from "./radar";
 
-const STORAGE_KEY = "szl-immune-lattice-v6";
+const STORAGE_KEY = "szl-immune-lattice-v7";
 
 async function genesis(): Promise<Receipt[]> {
   const r = await appendReceipt([], {
@@ -159,6 +160,7 @@ export interface ImmuneStore {
   briefingBusy: boolean;
   lastBind: { name: string; verb: RadarVerb; pass: boolean; hash: string | null; reason: string } | null;
   lastCanary: { id: string; hash: string | null; reason: string } | null;
+  lastField: { id: string; verb: string; pass: boolean; hash: string | null; reason: string } | null;
   setView: (view: ViewId) => void;
   setMode: (mode: ImmuneMode) => void;
   select: (id: string | null) => void;
@@ -181,6 +183,8 @@ export interface ImmuneStore {
   sweepInbound: () => Promise<void>;
   bindEngine: (name: string) => Promise<CycleResult>;
   pokeCanary: (id: string) => Promise<CycleResult>;
+  compileCell: (id: string) => Promise<CycleResult>;
+  huntField: (id: string) => Promise<CycleResult>;
 }
 
 export const useImmune = create<ImmuneStore>()((set, get) => ({
@@ -214,6 +218,7 @@ export const useImmune = create<ImmuneStore>()((set, get) => ({
   briefingBusy: false,
   lastBind: null,
   lastCanary: null,
+  lastField: null,
   setView: (view) => set({ view }),
   setMode: (mode) => {
     set({ mode });
@@ -799,6 +804,66 @@ export const useImmune = create<ImmuneStore>()((set, get) => ({
       { op: "HUNT", canary: id, gap: "ghost.lattice", evidence_class: "MEASURED" },
     );
     set({ lastCanary: { id, hash: result.receipt?.hash ?? null, reason: result.sentra.reason } });
+    persistSlice(get());
+    return result;
+  },
+  compileCell: async (id) => {
+    const cell = FIELD_CELLS.find((c) => c.id === id);
+    if (!cell) {
+      return {
+        pass: false,
+        mode: get().mode,
+        deadman: get().mode === "DEADMAN",
+        sentra: { accepted: false, reason: "unknown field cell", signatureMatched: "actor.unknown" },
+        huklla: [],
+        receipt: null,
+      };
+    }
+    const result = await get().runIntent("field-compiler", cell.intent, {
+      op: cell.op,
+      gap: cell.gap,
+      evidence_class: "MEASURED",
+      channel: "B",
+      field: cell.id,
+    });
+    set({
+      lastField: {
+        id: cell.id,
+        verb: cell.verb,
+        pass: result.pass,
+        hash: result.receipt?.hash ?? null,
+        reason: result.sentra.reason,
+      },
+    });
+    persistSlice(get());
+    return result;
+  },
+  huntField: async (id) => {
+    const pack = FIELD_HUNTS.find((h) => h.id === id);
+    if (!pack) {
+      return {
+        pass: false,
+        mode: get().mode,
+        deadman: get().mode === "DEADMAN",
+        sentra: { accepted: false, reason: "unknown hunt pack", signatureMatched: "actor.unknown" },
+        huklla: [],
+        receipt: null,
+      };
+    }
+    const result = await get().runIntent(
+      "field-hunter",
+      `HUNT ${pack.cluster} signatures ${pack.hunt} — RANGE twin only, never people, never a live grid`,
+      { op: "HUNT", gap: "cert.cell.quorum", evidence_class: "REFERENCE", cluster: pack.id },
+    );
+    set({
+      lastField: {
+        id: pack.id,
+        verb: "HUNT",
+        pass: result.pass,
+        hash: result.receipt?.hash ?? null,
+        reason: result.sentra.reason,
+      },
+    });
     persistSlice(get());
     return result;
   },

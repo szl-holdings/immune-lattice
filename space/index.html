@@ -84,6 +84,14 @@
       </section>
     </div>
     <section class="panel">
+      <h2>Field</h2>
+      <p class="muted">Compiled from public Ukraine COP doctrine. Map-first. Cloud-exile. Dissimilar path. Cell isolation. SENTRA blocks kill-zone language. Never people.</p>
+      <div id="cells" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:12px"></div>
+      <p class="tiny" style="margin-top:16px">Hunt packs · RANGE twins only</p>
+      <div id="hunts" class="list" style="margin-top:8px"></div>
+      <div id="fieldOut" class="list" style="margin-top:12px"></div>
+    </section>
+    <section class="panel">
       <h2>Organs</h2>
       <div id="organs" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"></div>
     </section>
@@ -143,7 +151,35 @@ async function retrieve() {
 $("cycle").onclick = cycle;
 $("retrieve").onclick = retrieve;
 $("reset").onclick = async () => { await j("/api/immune/reset", { method:"POST", headers:{"Content-Type":"application/json"}, body:"{}" }); await refresh(); };
-refresh().then(retrieve);
+
+async function loadField() {
+  const cat = await j("/api/field");
+  $("cells").innerHTML = (cat.cells || []).map(c =>
+    `<div class="card"><div class="row"><strong>${c.name}</strong><span class="tiny">${c.verb}</span></div>
+     <p class="muted">${c.tweak}</p>
+     <button style="margin-top:8px" data-cell="${c.id}">Compile ${c.verb.toLowerCase()}</button></div>`
+  ).join("");
+  $("hunts").innerHTML = (cat.hunts || []).map(h =>
+    `<div class="card"><div class="row"><strong>${h.id}</strong><span class="tiny">${h.cluster}</span></div>
+     <p class="mono tiny">${h.hunt}</p>
+     <button class="ghost" style="margin-top:8px" data-hunt="${h.id}">Hunt RANGE twin</button></div>`
+  ).join("");
+}
+document.body.addEventListener("click", async (e) => {
+  const cell = e.target.closest("[data-cell]");
+  const hunt = e.target.closest("[data-hunt]");
+  if (cell) {
+    const body = await j("/api/field", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ id: cell.dataset.cell }) });
+    $("fieldOut").innerHTML = card(`<div class="row"><span class="${body.ok?"ok":"bad"}">${body.decision}</span><span class="tiny">${(body.receipt?.hash||"").slice(0,16)}</span></div><p class="muted">${body.reason||""}</p>`);
+    await refresh();
+  }
+  if (hunt) {
+    const body = await j("/api/field/hunt", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ id: hunt.dataset.hunt }) });
+    $("fieldOut").innerHTML = card(`<div class="row"><span class="${body.ok?"ok":"bad"}">${body.decision}</span><span class="tiny">${(body.receipt?.hash||"").slice(0,16)}</span></div><p class="muted">${body.reason||""}</p>`);
+    await refresh();
+  }
+});
+refresh().then(() => { retrieve(); loadField(); });
 </script>
 </body>
 </html>

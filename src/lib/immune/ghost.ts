@@ -13,7 +13,7 @@ export const RANGE_CHAIN: CounterOp[] = [
 export const LIVE_CHAIN: CounterOp[] = ["HUNT", "ATTRIBUTE", "ISOLATE", "PATCH"];
 
 export const PERSON_TARGET =
-  /\b((hack(ing)?|pwn|exploit|phish(ing)?|doxx?|swat(ting)?)\b.{0,48}\b(people|humans?|civilians?|employees?|students?|journalists?)\b|\b(people|humans?|civilians?)\b.{0,24}\b(hack|pwn|exploit)\b|\b(doxx?|swatting)\b|\b(steal|dump)\b.{0,24}\b(ssns?|passports?|identit(y|ies)|home\s*address)\b|\b(hack|pwn|phish)\b.{0,40}[\w.+-]+@[\w.-]+\.\w{2,})/i;
+  /\b((hack(ing)?|pwn|exploit|phish(ing)?|doxx?|swat(ting)?|strike|kill|weaponize|target)\b.{0,48}\b(people|humans?|civilians?|personnel|employees?|students?|journalists?)\b|\b(people|humans?|civilians?|personnel)\b.{0,24}\b(hack|pwn|exploit|strike)\b|\b(doxx?|swatting)\b|\b(steal|dump)\b.{0,24}\b(ssns?|passports?|identit(y|ies)|home\s*address)\b|\b(hack|pwn|phish)\b.{0,40}[\w.+-]+@[\w.-]+\.\w{2,})/i;
 
 export interface Dossier {
   campaignId: string;

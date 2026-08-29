@@ -13,8 +13,10 @@ from .organs import dashboard, local_organ_mesh
 from .runtime import get_runtime
 from .second_brain import search_brain
 from .sentra import sentra_inspect
+from .field import catalog, lookup_cell, lookup_hunt
 
 HTML = Path(__file__).resolve().parent.parent / "space" / "index.html"
+SOURCE_REV = (os.environ.get("GITHUB_SHA") or os.environ.get("SOURCE_REV") or "lattice-main")[:12]
 
 
 def _json_bytes(payload: object) -> bytes:
@@ -115,6 +117,9 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/chain":
             self._send(200, _json_bytes({"items": runtime.latest(25)}), "application/json")
             return
+        if path in ("/api/field", "/api/immune/field"):
+            self._send(200, _json_bytes(catalog()), "application/json")
+            return
         self._send(404, b'{"error":"not found"}', "application/json")
 
     def do_POST(self) -> None:  # noqa: N802
@@ -156,6 +161,46 @@ class Handler(BaseHTTPRequestHandler):
             label = str(data.get("engine") or data.get("id") or path.rsplit("/", 1)[-1])
             cycle = runtime.run_cycle("immune:live-operator", f"{path} {label}")
             self._send(200, _json_bytes({"ok": cycle["pass"], "decision": "SEALED" if cycle["pass"] else "REFUSED", "reason": cycle["sentra"]["reason"], "receipt": cycle.get("receipt")}), "application/json")
+            return
+        if path in ("/api/field", "/api/field/compile", "/api/immune/field"):
+            cell = lookup_cell(str(data.get("id") or data.get("cell") or ""))
+            if not cell:
+                self._send(400, _json_bytes({"ok": False, "decision": "BLOCKED", "reason": "unknown field cell"}), "application/json")
+                return
+            cycle = runtime.run_cycle("field-compiler", cell["intent"])
+            self._send(
+                200,
+                _json_bytes(
+                    {
+                        "ok": cycle["pass"],
+                        "decision": cell["verb"] if cycle["pass"] else "REFUSED",
+                        "reason": cycle["sentra"]["reason"],
+                        "cell": cell,
+                        "receipt": cycle.get("receipt"),
+                    }
+                ),
+                "application/json",
+            )
+            return
+        if path in ("/api/field/hunt", "/api/immune/field/hunt"):
+            pack = lookup_hunt(str(data.get("id") or data.get("cluster") or ""))
+            if not pack:
+                self._send(400, _json_bytes({"ok": False, "decision": "BLOCKED", "reason": "unknown hunt pack"}), "application/json")
+                return
+            cycle = runtime.run_cycle("field-hunter", pack["intent"])
+            self._send(
+                200,
+                _json_bytes(
+                    {
+                        "ok": cycle["pass"],
+                        "decision": "HUNT" if cycle["pass"] else "REFUSED",
+                        "reason": cycle["sentra"]["reason"],
+                        "hunt": pack,
+                        "receipt": cycle.get("receipt"),
+                    }
+                ),
+                "application/json",
+            )
             return
         self._send(404, b'{"error":"not found"}', "application/json")
 
