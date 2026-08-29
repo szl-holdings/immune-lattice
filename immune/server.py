@@ -14,6 +14,7 @@ from .runtime import get_runtime
 from .second_brain import search_brain
 from .sentra import sentra_inspect
 from .field import catalog, lookup_cell, lookup_hunt
+from .dome import catalog as dome_catalog, lookup_layer
 
 HTML = Path(__file__).resolve().parent.parent / "space" / "index.html"
 SOURCE_REV = (os.environ.get("GITHUB_SHA") or os.environ.get("SOURCE_REV") or "lattice-main")[:12]
@@ -120,6 +121,9 @@ class Handler(BaseHTTPRequestHandler):
         if path in ("/api/field", "/api/immune/field"):
             self._send(200, _json_bytes(catalog()), "application/json")
             return
+        if path in ("/api/dome", "/api/immune/dome"):
+            self._send(200, _json_bytes(dome_catalog()), "application/json")
+            return
         self._send(404, b'{"error":"not found"}', "application/json")
 
     def do_POST(self) -> None:  # noqa: N802
@@ -196,6 +200,26 @@ class Handler(BaseHTTPRequestHandler):
                         "decision": "HUNT" if cycle["pass"] else "REFUSED",
                         "reason": cycle["sentra"]["reason"],
                         "hunt": pack,
+                        "receipt": cycle.get("receipt"),
+                    }
+                ),
+                "application/json",
+            )
+            return
+        if path in ("/api/dome", "/api/dome/compile", "/api/immune/dome"):
+            layer = lookup_layer(str(data.get("id") or data.get("layer") or ""))
+            if not layer:
+                self._send(400, _json_bytes({"ok": False, "decision": "BLOCKED", "reason": "unknown dome layer"}), "application/json")
+                return
+            cycle = runtime.run_cycle("dome-compiler", layer["intent"])
+            self._send(
+                200,
+                _json_bytes(
+                    {
+                        "ok": cycle["pass"],
+                        "decision": layer["verb"] if cycle["pass"] else "REFUSED",
+                        "reason": cycle["sentra"]["reason"],
+                        "layer": layer,
                         "receipt": cycle.get("receipt"),
                     }
                 ),

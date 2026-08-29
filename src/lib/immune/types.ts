@@ -9,6 +9,7 @@ export type ViewId =
   | "estate"
   | "radar"
   | "field"
+  | "dome"
   | "range"
   | "ghost"
   | "wraith"
@@ -127,6 +128,7 @@ export type CounterOp =
   | "PATCH"
   | "DECEIVE"
   | "INTERDICT"
+  | "INTERCEPT"
   | "STRIKE";
 
 export interface Campaign {

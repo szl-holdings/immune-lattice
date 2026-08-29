@@ -92,6 +92,12 @@
       <div id="fieldOut" class="list" style="margin-top:12px"></div>
     </section>
     <section class="panel">
+      <h2>Dome</h2>
+      <p class="muted">Iron Dome analog. Selective intercept. White-glove RANGE counter. Hunt / isolate / deceive / intercept — never strike people. Live hack-back is out of authority.</p>
+      <div id="layers" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:12px"></div>
+      <div id="domeOut" class="list" style="margin-top:12px"></div>
+    </section>
+    <section class="panel">
       <h2>Organs</h2>
       <div id="organs" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"></div>
     </section>
@@ -165,9 +171,18 @@ async function loadField() {
      <button class="ghost" style="margin-top:8px" data-hunt="${h.id}">Hunt RANGE twin</button></div>`
   ).join("");
 }
+async function loadDome() {
+  const cat = await j("/api/dome");
+  $("layers").innerHTML = (cat.layers || []).map(c =>
+    `<div class="card"><div class="row"><strong>${c.name}</strong><span class="tiny">${c.verb}</span></div>
+     <p class="muted">${c.analog} · ${c.tweak}</p>
+     <button style="margin-top:8px" data-layer="${c.id}">Compile ${c.verb.toLowerCase()}</button></div>`
+  ).join("");
+}
 document.body.addEventListener("click", async (e) => {
   const cell = e.target.closest("[data-cell]");
   const hunt = e.target.closest("[data-hunt]");
+  const layer = e.target.closest("[data-layer]");
   if (cell) {
     const body = await j("/api/field", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ id: cell.dataset.cell }) });
     $("fieldOut").innerHTML = card(`<div class="row"><span class="${body.ok?"ok":"bad"}">${body.decision}</span><span class="tiny">${(body.receipt?.hash||"").slice(0,16)}</span></div><p class="muted">${body.reason||""}</p>`);
@@ -178,8 +193,13 @@ document.body.addEventListener("click", async (e) => {
     $("fieldOut").innerHTML = card(`<div class="row"><span class="${body.ok?"ok":"bad"}">${body.decision}</span><span class="tiny">${(body.receipt?.hash||"").slice(0,16)}</span></div><p class="muted">${body.reason||""}</p>`);
     await refresh();
   }
+  if (layer) {
+    const body = await j("/api/dome", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ id: layer.dataset.layer }) });
+    $("domeOut").innerHTML = card(`<div class="row"><span class="${body.ok?"ok":"bad"}">${body.decision}</span><span class="tiny">${(body.receipt?.hash||"").slice(0,16)}</span></div><p class="muted">${body.reason||""}</p>`);
+    await refresh();
+  }
 });
-refresh().then(() => { retrieve(); loadField(); });
+refresh().then(() => { retrieve(); loadField(); loadDome(); });
 </script>
 </body>
 </html>

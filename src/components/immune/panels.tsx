@@ -8,6 +8,7 @@ import {
   Ghost,
   Lock,
   Map,
+  Orbit,
   Network,
   Radio,
   Share2,
@@ -23,6 +24,7 @@ import { HUKLLA_REGISTRY, WATCHER_FRAMEWORKS } from "@/lib/immune/huklla";
 import { LEADERS, MESH_ORGANS, GRAPH_EDGES, OP_COPY } from "@/lib/immune/doctrine";
 import { ACTOR_CLUSTERS, CANARIES, INFERENCE_RADAR, UNIQUE_GAPS } from "@/lib/immune/radar";
 import { FIELD_CELLS, FIELD_HUNTS } from "@/lib/immune/field";
+import { DOME_LAYERS, WHITE_GLOVE, discriminate } from "@/lib/immune/dome";
 import { DOSSIERS, LIVE_CHAIN, RANGE_CHAIN } from "@/lib/immune/ghost";
 import { listSentraSignatures } from "@/lib/immune/sentra";
 import { useImmune } from "@/lib/immune/store";
@@ -118,7 +120,8 @@ export function Inspector() {
           <div className="mt-3 flex flex-wrap gap-2">
             {ops.map((op) => {
               const meta = OP_COPY[op];
-              const blocked = op === "STRIKE" && !campaign.rangeOnly;
+              const blocked =
+                (op === "STRIKE" || op === "INTERCEPT" || op === "INTERDICT") && !campaign.rangeOnly;
               return (
                 <Button
                   key={op}
@@ -622,6 +625,20 @@ export function FieldView() {
           Map-first. Cloud-exile. Dissimilar path. Cell isolation. Taken from Delta, CERT-UA, and Strategy 3.0 —
           independently implemented. SENTRA blocks kill-zone and strike-drone language. Never people.
         </p>
+        <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-wider text-muted">
+          <a className="inline-flex items-center gap-1 hover:text-primary" href="https://szlholdings-immune-lattice.hf.space" target="_blank" rel="noreferrer">
+            Channel B live <ExternalLink className="size-3" />
+          </a>
+          <a className="inline-flex items-center gap-1 hover:text-primary" href="https://github.com/szl-holdings/immune-lattice" target="_blank" rel="noreferrer">
+            GitHub lattice
+          </a>
+          <a className="inline-flex items-center gap-1 hover:text-primary" href="https://a-11-oy.com/immune" target="_blank" rel="noreferrer">
+            Flagship tab
+          </a>
+          <a className="inline-flex items-center gap-1 hover:text-primary" href="https://a11oy.net/" target="_blank" rel="noreferrer">
+            Proof registry
+          </a>
+        </p>
         {lastField && (
           <p className="mt-3 rounded-sm border border-border bg-bg-subtle px-3 py-2 font-mono text-[11px] text-primary">
             Channel B {lastField.verb} {lastField.id} · {lastField.pass ? "SEALED" : "REFUSED"} ·{" "}
@@ -676,6 +693,103 @@ export function FieldView() {
   );
 }
 
+export function DomeView() {
+  const campaigns = useImmune((s) => s.campaigns);
+  const lastDome = useImmune((s) => s.lastDome);
+  const interceptDome = useImmune((s) => s.interceptDome);
+  const counterDome = useImmune((s) => s.counterDome);
+  const compileDome = useImmune((s) => s.compileDome);
+  const proveGloveRefuse = useImmune((s) => s.proveGloveRefuse);
+  const tracks = campaigns.filter((c) => c.status === "inbound" || c.rangeOnly || c.status === "watching");
+  return (
+    <div className="grid min-h-0 gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="hud-panel min-h-0 overflow-y-auto p-4">
+        <div className="flex items-center gap-2 text-primary">
+          <Orbit className="size-4" />
+          <h2 className="text-sm font-semibold">Dome · Iron Dome analog, white glove</h2>
+        </div>
+        <p className="mt-2 text-sm text-muted">
+          Radar tracks. BMC selects. Tamir intercepts the inbound object — not people. Open field is let-fall. After
+          intercept, hack-back is INTERDICT of the RANGE twin. Live internet stays fail-closed. {WHITE_GLOVE.glove}
+        </p>
+        {lastDome && (
+          <p className="mt-3 rounded-sm border border-border bg-bg-subtle px-3 py-2 font-mono text-[11px] text-primary">
+            {lastDome.verb} · {lastDome.verdict} · {lastDome.pass ? "SEALED" : "REFUSED"} ·{" "}
+            {lastDome.hash ? lastDome.hash.slice(0, 16) : lastDome.reason}
+          </p>
+        )}
+        <div className="mt-4 space-y-3">
+          {tracks.map((c) => {
+            const call = discriminate(c);
+            return (
+              <article key={c.id} className="rounded-md border border-border bg-bg-subtle p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-medium">{c.name}</p>
+                  <Badge
+                    tone={
+                      call.verdict === "HIT" ? "danger" : call.verdict === "MISS" ? "ok" : "mute"
+                    }
+                  >
+                    {call.verdict}
+                  </Badge>
+                </div>
+                <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-muted">
+                  {c.status} · {c.rangeOnly ? "RANGE" : "LIVE"} · {c.target}
+                </p>
+                <p className="mt-2 text-xs text-muted">{call.reason}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button size="sm" className="min-h-11" onClick={() => void interceptDome(c.id)}>
+                    {call.verdict === "HIT" ? "White-glove intercept" : call.verdict === "MISS" ? "Let fall" : "Watch / patch"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={c.rangeOnly ? "outline" : "danger"}
+                    className="min-h-11"
+                    onClick={() => void counterDome(c.id)}
+                  >
+                    {c.rangeOnly ? "Hack-back RANGE twin" : "Hack-back live (refused)"}
+                  </Button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+      <section className="hud-panel min-h-0 overflow-y-auto p-4">
+        <p className="font-mono text-[10px] uppercase tracking-wider text-muted">Layers · public doctrine</p>
+        <p className="mt-2 text-sm text-muted">
+          EL/M-2084 → BMC → Tamir → Iron Beam → Arrow. Taken, not cloned. Actuation {WHITE_GLOVE.actuation}. {WHITE_GLOVE.rule}.
+        </p>
+        <div className="mt-3 space-y-3">
+          {DOME_LAYERS.map((layer) => (
+            <article key={layer.id} className="rounded-md border border-border bg-bg-subtle p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-mono text-[10px] text-primary">{layer.name}</p>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-muted">{layer.analog}</span>
+              </div>
+              <p className="mt-2 text-xs text-muted">{layer.take}</p>
+              <p className="mt-2 text-xs text-fg">{layer.tweak}</p>
+              <Button size="sm" variant="outline" className="mt-3 min-h-11" onClick={() => void compileDome(layer.id)}>
+                Compile {layer.op.toLowerCase()}
+              </Button>
+            </article>
+          ))}
+        </div>
+        <Button
+          size="sm"
+          variant="danger"
+          className="mt-4 min-h-11 w-full"
+          onClick={() => void proveGloveRefuse()}
+        >
+          Prove: hack-back personnel is refused
+        </Button>
+        <p className="mt-6 font-mono text-[10px] uppercase tracking-wider text-muted">White glove</p>
+        <p className="mt-2 text-xs text-muted">{WHITE_GLOVE.hackBack}</p>
+      </section>
+    </div>
+  );
+}
+
 export function RangeView() {
   const campaigns = useImmune((s) => s.campaigns);
   const ops = useImmune((s) => s.ops);
@@ -717,7 +831,7 @@ export function RangeView() {
               </div>
               <p className="mt-1 text-xs text-muted">{c.summary}</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                {(["INTERDICT", "DECEIVE", "STRIKE"] as CounterOp[]).map((op) => (
+                {(["INTERCEPT", "INTERDICT", "DECEIVE", "STRIKE"] as CounterOp[]).map((op) => (
                   <Button key={op} size="sm" variant={op === "STRIKE" ? "danger" : "outline"} onClick={() => void runOp(op, c.id)}>
                     {OP_COPY[op].title}
                   </Button>

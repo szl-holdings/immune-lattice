@@ -132,6 +132,21 @@ export const SEED_CAMPAIGNS: Campaign[] = [
     rangeOnly: true,
   },
   {
+    id: "cmp-probe-miss",
+    name: "Noise rocket · open field",
+    actor: "APT-GHOST (RANGE)",
+    target: "open-field",
+    technique: "Unaimed inbound that will not hit estate objects",
+    atlas: "AML.T0040",
+    owasp: "LLM01",
+    severity: "low",
+    provenance: "RANGE",
+    summary:
+      "Simulated inbound whose trajectory misses defended estate. Iron Dome analog: let it fall. Do not spend a Tamir.",
+    status: "inbound",
+    rangeOnly: true,
+  },
+  {
     id: "cmp-kev-linux",
     name: "KEV watch · Linux IPv6 priv-esc",
     actor: "in-the-wild (CISA)",
@@ -334,6 +349,11 @@ export const OP_COPY: Record<
   INTERDICT: {
     title: "Interdict",
     blurb: "Cut the arc. Lattice effector: click → machine tasking on RANGE mesh.",
+    modeled: true,
+  },
+  INTERCEPT: {
+    title: "Intercept (Dome)",
+    blurb: "Tamir analog. Kill the inbound object, not people. White glove. RANGE packets never leave.",
     modeled: true,
   },
   STRIKE: {
