@@ -8,6 +8,7 @@ export type ViewId =
   | "intel"
   | "estate"
   | "radar"
+  | "field"
   | "range"
   | "ghost"
   | "wraith"

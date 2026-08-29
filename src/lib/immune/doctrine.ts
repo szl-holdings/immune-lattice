@@ -59,6 +59,18 @@ export const ESTATE_NODES: LatticeNode[] = [
     summary: "GitHub org — source of truth for IMMUNE, a11oy, killinchu.",
     tags: ["github", "source"],
   },
+  {
+    id: "estate-field",
+    kind: "estate",
+    name: "FIELD cell",
+    lat: 50.45,
+    lon: 30.52,
+    status: "nominal",
+    provenance: "REFERENCE",
+    summary:
+      "Compiled from public Ukraine COP doctrine: map-first, cloud-exile, dissimilar-path. Hunt / isolate / deceive. Never people.",
+    tags: ["field", "delta", "exile"],
+  },
 ];
 
 export const SEED_CAMPAIGNS: Campaign[] = [
@@ -161,6 +173,21 @@ export const SEED_CAMPAIGNS: Campaign[] = [
     status: "watching",
     rangeOnly: false,
   },
+  {
+    id: "cmp-sandworm-ot",
+    name: "RANGE · Sandworm OT twin",
+    actor: "G0034 (RANGE)",
+    target: "estate-field",
+    technique: "Industroyer-class OT wiper analog",
+    atlas: "T0801",
+    owasp: "LLM03",
+    severity: "critical",
+    provenance: "RANGE",
+    summary:
+      "RANGE recreation of public Sandworm TTPs (CaddyWiper, Industroyer2, IEC-104) against a simulated SCADA twin. HUNT / ISOLATE / DECEIVE. STRIKE only on the RANGE twin. Never people. Never a live substation.",
+    status: "inbound",
+    rangeOnly: true,
+  },
 ];
 
 export const SEED_ARCS: ThreatArc[] = [
@@ -171,6 +198,7 @@ export const SEED_ARCS: ThreatArc[] = [
   { id: "arc-5", from: "cmp-kev-linux", to: "estate-a11oy", intensity: 0.4, technique: "T1068", active: true },
   { id: "arc-6", from: "cmp-kev-citrix", to: "estate-killinchu", intensity: 0.38, technique: "T1190", active: true },
   { id: "arc-7", from: "cmp-react-rsc", to: "estate-immune", intensity: 0.7, technique: "T1190", active: true },
+  { id: "arc-8", from: "cmp-sandworm-ot", to: "estate-field", intensity: 0.82, technique: "T0801", active: true },
 ];
 
 export const THREAT_ORIGINS: LatticeNode[] = [
@@ -250,6 +278,17 @@ export const THREAT_ORIGINS: LatticeNode[] = [
     provenance: "LIVE",
     summary: "React Server Components RCE watch.",
     tags: ["kev", "rsc"],
+  },
+  {
+    id: "cmp-sandworm-ot",
+    kind: "range",
+    name: "G0034 RANGE",
+    lat: 55.75,
+    lon: 37.62,
+    status: "hostile",
+    provenance: "RANGE",
+    summary: "RANGE persona. Public Sandworm OT TTPs against a simulated twin. Not a live grid.",
+    tags: ["range", "ot", "sandworm"],
   },
 ];
 

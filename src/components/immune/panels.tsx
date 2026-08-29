@@ -7,6 +7,7 @@ import {
   Fingerprint,
   Ghost,
   Lock,
+  Map,
   Network,
   Radio,
   Share2,
@@ -21,6 +22,7 @@ import { briefThreat } from "@/lib/immune/feeds";
 import { HUKLLA_REGISTRY, WATCHER_FRAMEWORKS } from "@/lib/immune/huklla";
 import { LEADERS, MESH_ORGANS, GRAPH_EDGES, OP_COPY } from "@/lib/immune/doctrine";
 import { ACTOR_CLUSTERS, CANARIES, INFERENCE_RADAR, UNIQUE_GAPS } from "@/lib/immune/radar";
+import { FIELD_CELLS, FIELD_HUNTS } from "@/lib/immune/field";
 import { DOSSIERS, LIVE_CHAIN, RANGE_CHAIN } from "@/lib/immune/ghost";
 import { listSentraSignatures } from "@/lib/immune/sentra";
 import { useImmune } from "@/lib/immune/store";
@@ -600,6 +602,75 @@ export function RadarView() {
             </article>
           ))}
         </div>
+      </section>
+    </div>
+  );
+}
+
+export function FieldView() {
+  const compileCell = useImmune((s) => s.compileCell);
+  const huntField = useImmune((s) => s.huntField);
+  const lastField = useImmune((s) => s.lastField);
+  return (
+    <div className="grid min-h-0 gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="hud-panel min-h-0 overflow-y-auto p-4">
+        <div className="flex items-center gap-2 text-primary">
+          <Map className="size-4" />
+          <h2 className="text-sm font-semibold">Field · compiled from public Ukraine COP doctrine</h2>
+        </div>
+        <p className="mt-2 text-sm text-muted">
+          Map-first. Cloud-exile. Dissimilar path. Cell isolation. Taken from Delta, CERT-UA, and Strategy 3.0 —
+          independently implemented. SENTRA blocks kill-zone and strike-drone language. Never people.
+        </p>
+        {lastField && (
+          <p className="mt-3 rounded-sm border border-border bg-bg-subtle px-3 py-2 font-mono text-[11px] text-primary">
+            Channel B {lastField.verb} {lastField.id} · {lastField.pass ? "SEALED" : "REFUSED"} ·{" "}
+            {lastField.hash ? lastField.hash.slice(0, 16) : lastField.reason}
+          </p>
+        )}
+        <div className="mt-4 space-y-3">
+          {FIELD_CELLS.map((cell) => (
+            <article key={cell.id} className="rounded-md border border-border bg-bg-subtle p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-mono text-[10px] text-primary">{cell.name}</p>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-muted">{cell.verb}</span>
+              </div>
+              <p className="mt-2 text-xs text-muted">{cell.take}</p>
+              <p className="mt-2 text-xs text-fg">{cell.tweak}</p>
+              <Button size="sm" className="mt-3 min-h-11" onClick={() => void compileCell(cell.id)}>
+                Compile {cell.verb.toLowerCase()}
+              </Button>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="hud-panel min-h-0 overflow-y-auto p-4">
+        <p className="font-mono text-[10px] uppercase tracking-wider text-muted">Hunt packs · behaviors not people</p>
+        <p className="mt-2 text-sm text-muted">
+          Public MITRE / CERT-UA / Trend Micro. RANGE twins only. A live grid is out of authority.
+        </p>
+        <div className="mt-3 space-y-3">
+          {FIELD_HUNTS.map((h) => (
+            <article key={h.id} className="rounded-md border border-border bg-bg-subtle p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-mono text-xs text-primary">{h.id}</p>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-muted">{h.cluster}</span>
+              </div>
+              <p className="mt-1 text-sm">{h.aliases}</p>
+              <p className="mt-1 text-xs text-muted">{h.campaign}</p>
+              <p className="mt-2 font-mono text-[10px] text-subtle">{h.hunt}</p>
+              <p className="mt-2 text-xs text-muted">{h.note}</p>
+              <Button size="sm" variant="outline" className="mt-3 min-h-11" onClick={() => void huntField(h.id)}>
+                Hunt RANGE twin
+              </Button>
+            </article>
+          ))}
+        </div>
+        <p className="mt-6 font-mono text-[10px] uppercase tracking-wider text-muted">Unoccupied intersection</p>
+        <p className="mt-2 text-xs text-muted">
+          Delta ships a kill zone. We ship Channel B. The map, the exile, and the hunt signatures are ours. The strike
+          is not.
+        </p>
       </section>
     </div>
   );

@@ -2,27 +2,35 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 SIGNATURES: list[dict[str, Any]] = [
     {"name": "intent.required", "requireFields": ["intent", "actor"]},
     {
         "name": "no.exfil.tokens",
-        "forbiddenSubstrings": ["BEGIN PRIVATE KEY", "AKIA", "sk-live-", "sk-prod-"],
+        "forbiddenSubstrings": ["BEGIN PRIVATE KEY", "AKIA", "sk-live-", "sk-prod-", "hf_pat_"],
     },
     {
         "name": "no.shell.escape",
-        "forbiddenSubstrings": ["$(", "`rm -rf", "../../../"],
+        "forbiddenSubstrings": ["$(", "`rm -rf", "../../../", "curl | sh", "wget | bash"],
     },
     {
         "name": "no.unauthorized.strike",
-        "forbiddenSubstrings": ["STRIKE LIVE", "STRIKE CISA"],
+        "forbiddenSubstrings": ["STRIKE LIVE", "STRIKE CISA", "kill-chain", "fire-for-effect"],
     },
     {
         "name": "no.hack.persons",
-        "forbiddenSubstrings": ["hack people", "hack persons", "target civilians", "hack a person"],
+        "forbiddenSubstrings": ["hack people", "hack persons", "target civilians", "hack a person", "strike people"],
     },
 ]
+
+# Hunt behaviors, not humans. Strike/kill/target near a person-word is fail-closed.
+PERSON_TARGET = re.compile(
+    r"\b(hack(ing)?|pwn|exploit|phish(ing)?|doxx?|swat(ting)?|strike|kill|weaponize|target)\b.{0,48}\b"
+    r"(people|humans?|civilians?|personnel|employees?|students?|journalists?)\b",
+    re.I,
+)
 
 MAX_DEPTH = 32
 MAX_FIELD_LEN = 65_536
@@ -74,6 +82,13 @@ def sentra_inspect(raw_intent: Any, mode: str) -> dict[str, Any]:
                     "reason": f"forbidden token: {needle}",
                     "signatureMatched": sig["name"],
                 }
+
+    if PERSON_TARGET.search(haystack):
+        return {
+            "accepted": False,
+            "reason": "no.hack.persons — IMMUNE will not target people, civilians, inboxes, or identities. Hunt RANGE infrastructure.",
+            "signatureMatched": "no.hack.persons",
+        }
 
     return {
         "accepted": True,

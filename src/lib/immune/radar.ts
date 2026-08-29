@@ -181,6 +181,13 @@ export const ACTOR_CLUSTERS: ActorCluster[] = [
     hunt: "proc_creation_win_lolbin_* · dual-homed Wi-Fi adjacency",
   },
   {
+    id: "G0034",
+    aliases: "Sandworm · APT44 · ELECTRUM · Seashell Blizzard",
+    category: "State-nexus OT destruction",
+    techniques: "C0028 / C0025 / C0034 Ukraine power · Industroyer · CaddyWiper",
+    hunt: "caddywiper_mass_delete · industroyer_iec104_unauth · scada_iso_autorun",
+  },
+  {
     id: "G1017",
     aliases: "Volt Typhoon · Bronze Silhouette",
     category: "State-nexus · LOTL",
@@ -255,6 +262,30 @@ export const UNIQUE_GAPS: UniqueGap[] = [
     name: "IMMUNE.COMPILER.SIGNED_KERNEL",
     take: "OPA compiles Rego to WASM. Cedar is analyzable. E2B isolates agent code. DO-178C people say AI cannot be DAL A.",
     tweak: "Doctrine v11 → sealed WASM decision cell with SLSA provenance. Channel A (LLM) is Λ=Conjecture 1 advisory. Channel B holds the only effector keys and can veto A. A cannot veto B.",
+  },
+  {
+    id: "field.lattice.delta",
+    name: "FIELD.LATTICE.DELTA",
+    take: "Ukraine Delta is a map-first COP that grew bottom-up from a volunteer map into the national picture (CSIS, NATO CWIX, MoD 2023).",
+    tweak: "Compile the map. Objects are Spaces, receipts, kernels. Effectors isolate objects. Kill-zone / strike-drone language is SENTRA-blocked.",
+  },
+  {
+    id: "range.cloud.exile",
+    name: "RANGE.CLOUD.EXILE",
+    take: "Ukraine hosted Delta cloud abroad so missiles cannot kill the COP (gov approval Feb 2023).",
+    tweak: "YAWAR + Channel B live off-estate. A cell dying does not unwind the chain. GitHub is canonical. Hugging Face is the running hologram.",
+  },
+  {
+    id: "range.fallback.mesh",
+    name: "RANGE.FALLBACK.MESH",
+    take: "Starlink kept Ukrainian C2 alive when fiber and towers died. Dissimilar path, not a brand.",
+    tweak: "Two transports or fail-closed. We do not vendor a constellation. A single hose is a halt.",
+  },
+  {
+    id: "cert.cell.quorum",
+    name: "CERT.CELL.QUORUM",
+    take: "CERT-UA plus private sector plus volunteers foiled Industroyer2 in 2022. Decentralized C2 survived jamming.",
+    tweak: "Isolate one cell, mesh holds. Volunteer fabric is HUNT only. No DDoS, no hack-and-leak, no people.",
   },
 ];
 
@@ -360,6 +391,18 @@ export const FIELD_LEADERS: LeaderCategory[] = [
         what: "AI battle-management. Fuse sensors and effectors. Mesh at the edge.",
         url: "https://www.anduril.com/lattice/command-and-control",
         take: "Take click → machine-to-machine tasking. Tweak: effectors isolate objects (host, token, Space, kernel). Never people.",
+      },
+      {
+        name: "Ukraine Delta",
+        what: "Map-first COP. Bottom-up from Aerorozvidka. Cloud-exile. NATO CWIX. Independent 160-req cyber assessment.",
+        url: "https://www.csis.org/analysis/does-ukraine-already-have-functional-cjadc2-technology",
+        take: "Take the map and the exile. Tweak: we compile hunt / isolate / deceive. SENTRA blocks kill-zone language. Never people.",
+      },
+      {
+        name: "CERT-UA",
+        what: "Public UAC clusters. Foiled Industroyer2 + CaddyWiper on power (2022) with ESET / Microsoft.",
+        url: "https://attack.mitre.org/groups/G0034/",
+        take: "Take hunt signatures as objects. Tweak: RANGE twins only. Never a live substation.",
       },
       {
         name: "Palantir Gotham",
