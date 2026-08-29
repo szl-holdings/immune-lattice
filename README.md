@@ -31,7 +31,8 @@ The full TanStack COP (globe, RANGE, GHOST, WRAITH, ECHO) lives in this GitHub r
 | Tab | What it is |
 |---|---|
 | Radar | BIND / WRAP / WATCH / IGNORE. Mint a receipt. TGI is IGNORE. |
-| Estate | Live SZLHOLDINGS pulse + canary fabric |
+| SENTRA | Fail-closed admission. HUKLLA tripwires. RANGE observation. |
+| Estate | Live SZLHOLDINGS pulse + GHOST.LATTICE.CANARY fabric |
 | Intel | MITRE hunt clusters — behaviors, not people |
 | Doctrine | Taken from Palantir / Anduril / Sigstore / DO-178C — made ours |
 
