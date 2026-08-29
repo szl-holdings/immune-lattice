@@ -7,7 +7,7 @@ sdk: docker
 app_port: 7860
 pinned: false
 license: apache-2.0
-short_description: Verifiable AI defense COP. Doctrine v11.
+short_description: Verifiable AI defense COP. Channel B.
 tags:
   - governed-ai
   - immune
@@ -20,31 +20,25 @@ tags:
 
 Command overlay for [szl-holdings/immune](https://github.com/szl-holdings/immune) — the live kernel on [SZLHOLDINGS/immune](https://huggingface.co/spaces/SZLHOLDINGS/immune).
 
-This repository is the Grok Lattice COP: SENTRA admission, YAWAR SHA-256 receipts, HUKLLA tripwires, RANGE / GHOST / WRAITH / ECHO, inference radar, and the estate pulse against live Hugging Face + GitHub.
+**This Hugging Face Space is Channel B** — a stdlib decision cell that mints `ECHO.RECEIPT.INFERENCE` receipts and trips `GHOST.LATTICE.CANARY`. No npm. The LLM never holds the key.
+
+The full TanStack COP (globe, RANGE, GHOST, WRAITH, ECHO) lives in this GitHub repository and in the Grok preview. They share doctrine, not a process.
 
 **Doctrine v11 LOCKED.** Λ = Conjecture 1 (never a theorem). Defense only: hunt, isolate, deceive. Never strike people.
 
-## Why a second repo
-
-`immune` is the authority kernel (Express + Vite, HF Space `SZLHOLDINGS/immune`).
-`immune-lattice` is the operator HUD remake (TanStack Start). They share doctrine, not a process.
-
-## Surfaces
+## Surfaces (this Space)
 
 | Tab | What it is |
 |---|---|
-| Lattice | Globe COP of estate + threat objects |
-| Sentra | Admission signatures, fail-closed |
-| Yawar | Append-only receipt chain |
-| Huklla | Tripwires |
-| Intel | Live CISA KEV + Rekor + MITRE hunt clusters |
-| Estate | SZLHOLDINGS Spaces / models / GitHub, BUILD_ERROR quarantine, canary fabric |
-| Radar | BIND / WRAP / WATCH / IGNORE inference map. Mint ECHO.RECEIPT.INFERENCE |
-| Range / Ghost / Wraith / Echo | White-hat RANGE only |
-| Doctrine | Taken from Palantir, Anduril, OverWatch, Model Armor, Sigstore — independently implemented |
+| Radar | BIND / WRAP / WATCH / IGNORE. Mint a receipt. TGI is IGNORE. |
+| Estate | Live SZLHOLDINGS pulse + canary fabric |
+| Intel | MITRE hunt clusters — behaviors, not people |
+| Doctrine | Taken from Palantir / Anduril / Sigstore / DO-178C — made ours |
 
-## Hugging Face
+## Why a second repo
 
-Published to `SZLHOLDINGS/immune-lattice` by the Immune write token (`mirror-khipu-hub.yml`). Sibling deploys that skip on empty `HF_TOKEN` are not LIVE.
+`immune` is the authority kernel. `immune-lattice` is the operator HUD. Channel B on this Space is the dual-channel compiler nobody else ships.
 
-Λ uniqueness is Conjecture 1.
+## Factory
+
+`FROM mirror.gcr.io/library/python:3.12-slim`. Anatomy already proved this pin. `npm ci` / `vite dev` is how sibling labs hit BUILD_ERROR.
