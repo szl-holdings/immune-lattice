@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Globe2, Radio, Shield, Fingerprint, Boxes, Swords, Lock, Activity, Network, Share2, Ghost, ScanEye, Split, Cpu, Map } from "lucide-react";
+import { Globe2, Radio, Shield, Fingerprint, Boxes, Swords, Lock, Activity, Network, Share2, Ghost, ScanEye, Split, Cpu, Map, Orbit } from "lucide-react";
 import { LatticeGlobe } from "./LatticeGlobe";
 import {
   CommandDock,
@@ -14,6 +14,7 @@ import {
   MeshView,
   RadarView,
   FieldView,
+  DomeView,
   RangeView,
   SentraView,
   StatusBar,
@@ -36,6 +37,7 @@ const VIEWS: { id: ViewId; label: string; icon: typeof Globe2 }[] = [
   { id: "estate", label: "Estate", icon: Boxes },
   { id: "radar", label: "Radar", icon: Cpu },
   { id: "field", label: "Field", icon: Map },
+  { id: "dome", label: "Dome", icon: Orbit },
   { id: "range", label: "Range", icon: Swords },
   { id: "ghost", label: "Ghost", icon: Ghost },
   { id: "wraith", label: "Wraith", icon: ScanEye },
@@ -92,6 +94,23 @@ export function CommandCenter() {
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted">
               Lattice · verifiable AI defense
             </p>
+            <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-wider text-muted">
+              <a className="hover:text-primary" href="https://a-11-oy.com/immune" target="_blank" rel="noreferrer">
+                a-11-oy.com/immune
+              </a>
+              <a className="hover:text-primary" href="https://a11oy.net/" target="_blank" rel="noreferrer">
+                a11oy.net
+              </a>
+              <a className="hover:text-primary" href="https://szlholdings-immune.hf.space" target="_blank" rel="noreferrer">
+                Channel A
+              </a>
+              <a className="hover:text-primary" href="https://szlholdings-immune-lattice.hf.space" target="_blank" rel="noreferrer">
+                Channel B
+              </a>
+              <a className="hover:text-primary" href="https://github.com/szl-holdings/immune-lattice" target="_blank" rel="noreferrer">
+                GitHub
+              </a>
+            </p>
           </div>
         </div>
         <nav className="flex w-full gap-1 overflow-x-auto pb-1 sm:ml-auto sm:w-auto sm:pb-0" aria-label="Surfaces">
@@ -146,6 +165,7 @@ export function CommandCenter() {
               {view === "estate" && <EstateView />}
               {view === "radar" && <RadarView />}
               {view === "field" && <FieldView />}
+              {view === "dome" && <DomeView />}
               {view === "range" && <RangeView />}
               {view === "ghost" && <GhostView />}
               {view === "wraith" && <WraithView />}

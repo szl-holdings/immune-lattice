@@ -6,6 +6,7 @@ export const RANGE_CHAIN: CounterOp[] = [
   "TARPIT",
   "DECEIVE",
   "SINKHOLE",
+  "INTERCEPT",
   "INTERDICT",
   "STRIKE",
 ];
@@ -69,6 +70,7 @@ export function seedSessions(campaigns: Campaign[]): GhostSession[] {
 
 export function evolveSessionState(state: GhostSession["state"], op: CounterOp): GhostSession["state"] {
   if (op === "STRIKE" || op === "INTERDICT") return "dark";
+  if (op === "INTERCEPT") return "tarpitted";
   if (op === "SINKHOLE" || op === "DECEIVE") return "sunk";
   if (op === "TARPIT" || op === "ISOLATE") return "tarpitted";
   return state;

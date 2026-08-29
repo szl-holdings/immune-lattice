@@ -287,6 +287,18 @@ export const UNIQUE_GAPS: UniqueGap[] = [
     take: "CERT-UA plus private sector plus volunteers foiled Industroyer2 in 2022. Decentralized C2 survived jamming.",
     tweak: "Isolate one cell, mesh holds. Volunteer fabric is HUNT only. No DDoS, no hack-and-leak, no people.",
   },
+  {
+    id: "immune.dome.select",
+    name: "IMMUNE.DOME.SELECTIVE",
+    take: "Iron Dome fires Tamir only if the rocket will hit a defended area. Open field is let-fall. Selectivity is the cost doctrine.",
+    tweak: "BMC discriminates HIT / MISS / WATCH. Intercept inbound objects that will hit estate. LIVE KEV stays PATCH. Do not spend an interceptor on noise.",
+  },
+  {
+    id: "immune.dome.glove",
+    name: "IMMUNE.DOME.WHITEGLOVE",
+    take: "Private hack-back of live internet is out of authority (CFAA-class). Iron Dome does not bomb the launch crew. INCD defends the edge.",
+    tweak: "White glove: operator click + SENTRA + YAWAR + Channel B. After intercept, INTERDICT the RANGE twin. Never people. Never a live third-party host.",
+  },
 ];
 
 export const CANARIES = [

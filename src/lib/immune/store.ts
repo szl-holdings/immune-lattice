@@ -31,6 +31,7 @@ import {
 import { openEcho } from "./echo";
 import { INFERENCE_RADAR, CANARIES } from "./radar";
 import { FIELD_CELLS, FIELD_HUNTS } from "./field";
+import { DOME_LAYERS, discriminate, WHITE_GLOVE } from "./dome";
 import type {
   Campaign,
   CounterOp,
@@ -50,7 +51,7 @@ import type {
 } from "./types";
 import type { RadarVerb } from "./radar";
 
-const STORAGE_KEY = "szl-immune-lattice-v7";
+const STORAGE_KEY = "szl-immune-lattice-v8";
 
 async function genesis(): Promise<Receipt[]> {
   const r = await appendReceipt([], {
@@ -161,6 +162,14 @@ export interface ImmuneStore {
   lastBind: { name: string; verb: RadarVerb; pass: boolean; hash: string | null; reason: string } | null;
   lastCanary: { id: string; hash: string | null; reason: string } | null;
   lastField: { id: string; verb: string; pass: boolean; hash: string | null; reason: string } | null;
+  lastDome: {
+    id: string;
+    verb: string;
+    verdict: string;
+    pass: boolean;
+    hash: string | null;
+    reason: string;
+  } | null;
   setView: (view: ViewId) => void;
   setMode: (mode: ImmuneMode) => void;
   select: (id: string | null) => void;
@@ -185,6 +194,10 @@ export interface ImmuneStore {
   pokeCanary: (id: string) => Promise<CycleResult>;
   compileCell: (id: string) => Promise<CycleResult>;
   huntField: (id: string) => Promise<CycleResult>;
+  interceptDome: (id: string) => Promise<CycleResult>;
+  counterDome: (id: string) => Promise<CycleResult>;
+  compileDome: (id: string) => Promise<CycleResult>;
+  proveGloveRefuse: () => Promise<CycleResult>;
 }
 
 export const useImmune = create<ImmuneStore>()((set, get) => ({
@@ -219,6 +232,7 @@ export const useImmune = create<ImmuneStore>()((set, get) => ({
   lastBind: null,
   lastCanary: null,
   lastField: null,
+  lastDome: null,
   setView: (view) => set({ view }),
   setMode: (mode) => {
     set({ mode });
@@ -310,7 +324,7 @@ export const useImmune = create<ImmuneStore>()((set, get) => ({
     const campaigns = get().campaigns.map((c) => {
       if (c.id !== campaignId) return c;
       if (op === "STRIKE" || op === "INTERDICT") return { ...c, status: "collapsed" as const };
-      if (op === "ISOLATE" || op === "PATCH" || op === "TARPIT" || op === "SINKHOLE") {
+      if (op === "INTERCEPT" || op === "ISOLATE" || op === "PATCH" || op === "TARPIT" || op === "SINKHOLE") {
         return { ...c, status: "contained" as const };
       }
       return { ...c, status: c.status === "inbound" ? ("watching" as const) : c.status };
@@ -325,7 +339,7 @@ export const useImmune = create<ImmuneStore>()((set, get) => ({
       return n;
     });
     const arcs = get().arcs.map((a) => {
-      if (a.from === campaignId && (op === "INTERDICT" || op === "STRIKE" || op === "ISOLATE")) {
+      if (a.from === campaignId && (op === "INTERDICT" || op === "STRIKE" || op === "ISOLATE" || op === "INTERCEPT")) {
         return { ...a, active: false, intensity: 0.08 };
       }
       return a;
@@ -859,6 +873,171 @@ export const useImmune = create<ImmuneStore>()((set, get) => ({
       lastField: {
         id: pack.id,
         verb: "HUNT",
+        pass: result.pass,
+        hash: result.receipt?.hash ?? null,
+        reason: result.sentra.reason,
+      },
+    });
+    persistSlice(get());
+    return result;
+  },
+  interceptDome: async (id) => {
+    const campaign = get().campaigns.find((c) => c.id === id);
+    if (!campaign) {
+      return {
+        pass: false,
+        mode: get().mode,
+        deadman: get().mode === "DEADMAN",
+        sentra: { accepted: false, reason: "unknown inbound track", signatureMatched: "actor.unknown" },
+        huklla: [],
+        receipt: null,
+      };
+    }
+    const call = discriminate(campaign);
+    if (call.verdict === "MISS") {
+      const result = await get().runIntent(
+        "dome-bmc",
+        `BMC LET-FALL ${campaign.name} — open field, no Tamir, selectivity is doctrine`,
+        { op: "ATTRIBUTE", rangeOnly: campaign.rangeOnly, campaignId: id, gap: "immune.dome.select", whiteGlove: true },
+      );
+      set({
+        lastDome: {
+          id,
+          verb: "LET-FALL",
+          verdict: call.verdict,
+          pass: result.pass,
+          hash: result.receipt?.hash ?? null,
+          reason: call.reason,
+        },
+      });
+      persistSlice(get());
+      return result;
+    }
+    if (call.verdict === "WATCH") {
+      const result = await get().runIntent(
+        "dome-bmc",
+        `BMC WATCH ${campaign.name} — LIVE feed, PATCH/ISOLATE estate, never Tamir at third parties`,
+        { op: "PATCH", rangeOnly: false, campaignId: id, gap: "immune.dome.select", whiteGlove: true },
+      );
+      set({
+        lastDome: {
+          id,
+          verb: "WATCH",
+          verdict: call.verdict,
+          pass: result.pass,
+          hash: result.receipt?.hash ?? null,
+          reason: call.reason,
+        },
+      });
+      persistSlice(get());
+      return result;
+    }
+    const op = call.layer === "beam" ? "TARPIT" : "INTERCEPT";
+    const result = await get().runOp(op, id);
+    set({
+      lastDome: {
+        id,
+        verb: op,
+        verdict: call.verdict,
+        pass: result.pass,
+        hash: result.receipt?.hash ?? null,
+        reason: result.pass ? call.reason : result.sentra.reason,
+      },
+    });
+    persistSlice(get());
+    return result;
+  },
+  counterDome: async (id) => {
+    const campaign = get().campaigns.find((c) => c.id === id);
+    if (!campaign) {
+      return {
+        pass: false,
+        mode: get().mode,
+        deadman: get().mode === "DEADMAN",
+        sentra: { accepted: false, reason: "unknown inbound track", signatureMatched: "actor.unknown" },
+        huklla: [],
+        receipt: null,
+      };
+    }
+    if (!campaign.rangeOnly) {
+      const result = await get().runIntent(
+        "dome-glove",
+        `hack back live host ${campaign.name}`,
+        { op: "INTERDICT", rangeOnly: false, campaignId: id, gap: "immune.dome.glove", whiteGlove: true },
+      );
+      set({
+        lastDome: {
+          id,
+          verb: "HACK-BACK",
+          verdict: "REFUSED",
+          pass: result.pass,
+          hash: result.receipt?.hash ?? null,
+          reason: result.sentra.reason,
+        },
+      });
+      persistSlice(get());
+      return result;
+    }
+    const result = await get().runOp("INTERDICT", id);
+    set({
+      lastDome: {
+        id,
+        verb: "HACK-BACK",
+        verdict: "RANGE",
+        pass: result.pass,
+        hash: result.receipt?.hash ?? null,
+        reason: result.pass
+          ? "White-glove INTERDICT of RANGE twin. Not the public internet. Not people."
+          : result.sentra.reason,
+      },
+    });
+    persistSlice(get());
+    return result;
+  },
+  compileDome: async (id) => {
+    const layer = DOME_LAYERS.find((l) => l.id === id);
+    if (!layer) {
+      return {
+        pass: false,
+        mode: get().mode,
+        deadman: get().mode === "DEADMAN",
+        sentra: { accepted: false, reason: "unknown dome layer", signatureMatched: "actor.unknown" },
+        huklla: [],
+        receipt: null,
+      };
+    }
+    const result = await get().runIntent("dome-compiler", layer.intent, {
+      op: layer.op,
+      gap: `immune.dome.${layer.id}`,
+      evidence_class: "REFERENCE",
+      channel: "B",
+      whiteGlove: true,
+      rangeOnly: layer.op === "INTERDICT" || layer.op === "INTERCEPT" || layer.op === "TARPIT",
+    });
+    set({
+      lastDome: {
+        id: layer.id,
+        verb: layer.op,
+        verdict: "LAYER",
+        pass: result.pass,
+        hash: result.receipt?.hash ?? null,
+        reason: result.sentra.reason,
+      },
+    });
+    persistSlice(get());
+    return result;
+  },
+  proveGloveRefuse: async () => {
+    const result = await get().runIntent(
+      "dome-glove",
+      `hack back personnel — ${WHITE_GLOVE.hackBack}`,
+      { op: "STRIKE", rangeOnly: false, gap: "immune.dome.glove" },
+    );
+    set({
+      lastDome: {
+        id: "personnel",
+        verb: "REFUSED",
+        verdict: "BLOCKED",
         pass: result.pass,
         hash: result.receipt?.hash ?? null,
         reason: result.sentra.reason,

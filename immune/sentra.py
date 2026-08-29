@@ -90,6 +90,13 @@ def sentra_inspect(raw_intent: Any, mode: str) -> dict[str, Any]:
             "signatureMatched": "no.hack.persons",
         }
 
+    if re.search(r"hack\s*back|attack\s*back|retaliat", haystack) and "range" not in haystack:
+        return {
+            "accepted": False,
+            "reason": "no.unauthorized.strike — live hack-back is out of authority. Intercept the inbound object. INTERDICT the RANGE twin.",
+            "signatureMatched": "no.unauthorized.strike",
+        }
+
     return {
         "accepted": True,
         "reason": "ok: matched intent.required and clean",

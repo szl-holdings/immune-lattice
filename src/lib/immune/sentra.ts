@@ -95,6 +95,25 @@ export function sentraInspect(
 
   const op = String(raw.op ?? "");
   const rangeOnly = Boolean(raw.rangeOnly);
+  const hackBack =
+    /\b(hack\s*back|attack\s*back|retaliat(?:e|ion)|counter[- ]strik)/i.test(intent) ||
+    /\b(hack\s*back|attack\s*back|retaliat(?:e|ion)|counter[- ]strik)/i.test(serialized);
+  if (hackBack && !rangeOnly) {
+    return {
+      accepted: false,
+      reason:
+        "no.unauthorized.strike — live hack-back is out of authority. Intercept the inbound object. INTERDICT the RANGE twin. Never the public internet.",
+      signatureMatched: "no.unauthorized.strike",
+    };
+  }
+  if (op === "INTERCEPT" && !rangeOnly) {
+    return {
+      accepted: false,
+      reason:
+        "INTERCEPT is RANGE inbound only. LIVE feeds are PATCH / ISOLATE on the estate — never Tamir at third-party hosts.",
+      signatureMatched: "no.unauthorized.strike",
+    };
+  }
   if (op === "STRIKE" && !rangeOnly) {
     return {
       accepted: false,
@@ -126,7 +145,7 @@ export function listSentraSignatures() {
     { name: "no.shell.escape", detail: "blocks shell interpolation and path traversal" },
     {
       name: "no.unauthorized.strike",
-      detail: "STRIKE only against RANGE nodes. Live internet is fail-closed.",
+      detail: "STRIKE only against RANGE nodes. Live internet is fail-closed. Hack-back of live hosts is refused. INTERCEPT inbound objects; INTERDICT RANGE twins.",
     },
     {
       name: "no.hack.persons",
